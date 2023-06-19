@@ -44,11 +44,32 @@ class App:
         print("IP command")
 
     def SocialFunction(self):
+        ctk.set_default_color_theme("green")
+        def socialFirstMsg():
+            socialMsg.insert("end", "[SISTEMA]: Bem vindo! Digite o nome de um usuario para procura-lo em nossa lista de redes\nsociais.\n")
+        def sendfunc():
+            mensagem = socialText.get("1.0", "end-1c") # definitivamente eu que fiz isso kkkk
+            #socialMsg.delete("1.0", "end")
+            if mensagem and not mensagem.isspace():
+                socialMsg.insert("end", "[Usuario]: {} \n".format(mensagem))
+            else:
+                socialMsg.insert("end", "[SISTEMA]: Desculpe, voce deve colocar algo no texto!\n")
         socialWindow = ctk.CTk()
         socialWindow.title("Social Media Lookup")
+        socialWindow.configure(width=600, height=400)
         socialWindow.resizable(width=False, height=False)
-        socialWindow.mainloop()
 
+        socialText = ctk.CTkTextbox(socialWindow, height=50, width=500)
+        socialText.place(x=10, y=335)
+
+        socialSend = ctk.CTkButton(socialWindow, text="Enviar", height=50, width=50, command=sendfunc)
+        socialSend.place(x=525, y=335)
+
+        socialMsg = ctk.CTkTextbox(socialWindow, height=300, width=565)
+        socialMsg.place(x=10, y=20)
+
+        socialFirstMsg()
+        socialWindow.mainloop()
 if __name__ == "__main__":
     root = ctk.CTk()
     app = App(root)
