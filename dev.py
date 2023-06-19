@@ -47,6 +47,7 @@ class App:
         print("test")
 
     def SocialFunction(self):
+        ctk.set_default_color_theme("green")
         print_lock = threading.Lock()
 
         WEBSITES = [
@@ -60,6 +61,9 @@ class App:
             "contently", "houzz", "blipfm", "wikipedia", "hackernews", "reverb_nation", "designspiration",
             "bandcamp", "colourlovers", "ifttt", "ebay", "slack", "okcupid", "trip", "ello", "tracky", "basecamp"
         ]
+        
+        def socialFirstMsg():
+            socialMsg.insert("end", "[SISTEMA]: Bem vindo! Digite o nome de um usuário para procurá-lo em nossa lista de redes sociais.\n")
 
 
         def trolling():
@@ -69,38 +73,39 @@ class App:
                     url = socialMsg.insert("end", "[SISTEMA]: Rede Social encontrada: https://www.{}.com/{}\n".format(website,vitima))
             else:
                 pass
-
-        def socialFirstMsg():
-            socialMsg.insert("end", "[SISTEMA]: Bem vindo! Digite o nome de um usuário para procurá-lo em nossa lista de redes sociais.\n")
-
         def sendfunc():
             vitima = socialText.get("1.0", "end-1c")
+            
+            
+            
             if vitima and not vitima.isspace():
                 socialMsg.insert("end", "[Usuário]: {}\n".format(vitima))
-
+                
                 with concurrent.futures.ThreadPoolExecutor(max_workers=30) as executor:
-                    for website in WEBSITES:
-                        source = requests.get(url).text
-                        if vitima in source:
-                            with print_lock:
-                                url = socialMsg.insert("end", "[SISTEMA]: Rede Social encontrada: https://www.{}.com/{}\n".format(website,vitima))
-                        else:
-                            pass
-                        
-                        
-                        executor.submit(url, vitima)
+                    for url in WEBSITES:
+                        executor.submit(sendfunc, url)
+                
+                source = requests.get(url).text
+                if vitima in source:
+                    with print_lock:
+                        socialMsg.insert("end", "[SISTEMA]: Rede Social encontrada: {}\n".format(url))
+                else:
+                    pass
+                
             else:
                 socialMsg.insert("end", "[SISTEMA]: Desculpe, você deve digitar algo no texto!\n")
 
+           
+
         socialWindow = ctk.CTk()
         socialWindow.title("Social Media Lookup")
-        socialWindow.configure(width=600, height=400)
+        socialWindow.configure(width=740, height=480)
         socialWindow.resizable(width=False, height=False)
 
         socialText = ctk.CTkTextbox(socialWindow, height=5, width=500)
         socialText.place(x=10, y=335)
 
-        socialSend = ctk.CTkButton(socialWindow, text="Enviar", height=1, width=10, command=sendfunc)
+        socialSend = ctk.CTkButton(socialWindow, text="Enviar", height=30, width=10, command=sendfunc)
         socialSend.place(x=525, y=335)
 
         socialMsg = ctk.CTkTextbox(socialWindow, height=300, width=565)
