@@ -66,7 +66,7 @@ class App:
             source = requests.get(url).text
             if vitima in source:
                 with print_lock:
-                    print(f"funcionou?")
+                    url = socialMsg.insert("end", "[SISTEMA]: Rede Social encontrada: https://www.{}.com/{}\n".format(website,vitima))
             else:
                 pass
 
@@ -88,7 +88,7 @@ class App:
                             pass
                         
                         
-                        executor.submit(osint, url, vitima)
+                        executor.submit(url, vitima)
             else:
                 socialMsg.insert("end", "[SISTEMA]: Desculpe, você deve digitar algo no texto!\n")
 
