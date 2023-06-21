@@ -1,15 +1,9 @@
-# BOZOINTS KKKKKKKK 🤡
-WELCOME FOR ALL DEVS ON THE TROLLING ZONE (me having schizo grr)\
+# BOSINTS 🔎
 Um programa basico de OSINT (Open Source Inteligence) para procurar cyber criminais\
 Abreviação de Basic Open Source Inteligence Search
 
-## STUFF2ADD
 
-- Dark Theme & White theme (with switch button)
-- More searching tools and stuff
-- Optimize it cuz i cant handle that shit anymore :sob:
-  
-## Funcionalidades
+## Funcionalidades 🖥️
 
 - Localizacao de IP
 - Busca de nomes de usuarios em sites
@@ -24,7 +18,7 @@ e digite isso:
 ```
 qualquer coisa e so procurar como baixar as dependencias, o nome delas estao no requirements.txt
     
-## Creditos
+## Creditos 📖
 
 - [@ThatLukinhasGuy](https://www.github.com/octokatherine) por ter ajudado na parte de queue dos websites
 - [@Visivel](https://www.github.com/visivel) eu poxa
