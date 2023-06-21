@@ -1,8 +1,14 @@
-# BOSINTS
+# BOZOINTS KKKKKKKK 🤡
+WELCOME FOR ALL DEVS ON THE TROLLING ZONE (me having schizo grr)
 Um programa basico de OSINT (Open Source Inteligence) para procurar cyber criminais\
 Abreviação de Basic Open Source Inteligence Search
 
+## STUFF2ADD
 
+- Dark Theme & White theme (with switch button)
+- More searching tools and stuff
+- Optimize it cuz i cant handle that shit anymore :sob:
+  
 ## Funcionalidades
 
 - Localizacao de IP
