@@ -1,5 +1,8 @@
-import customtkinter
 import customtkinter as ctk
+import threading
+import concurrent.futures
+import requests
+
 
 class App:
     def __init__(self, root):
@@ -13,7 +16,7 @@ class App:
         root.geometry(alignstr)
         root.resizable(width=False, height=False)
 
-        mainFrame = customtkinter.CTkFrame(root)
+        mainFrame = ctk.CTkFrame(root)
         mainFrame.grid(row=0, column=0, padx=60, pady=20, sticky="nsw")
         mainFrame.configure(width=600, height=250)
 
@@ -36,33 +39,104 @@ class App:
         labelCredits.place(x=300, y=350)
 
         buttonSocial = ctk.CTkButton(root)
-        buttonSocial.configure(font=("Alguma outra coisa", 25), text="Social Media Lookup", command=self.SocialFunction)
+        buttonSocial.configure(font=("roboto", 25), text="Social Media Lookup", command=self.SocialFunction)
         buttonSocial.place(x=390, y=150)
         buttonSocial.configure(width=237, height=89)
 
     def IPFunction(self):
-        print("IP command")
+        ctk.set_default_color_theme("green")
+        def firstmsg():
+            ipMsg.insert("end","[SISTEMA]: Bem vindo! Digite um IP para localiza-lo.\n")
+        def ipsendfunc():
+            ipvitima = ipText.get("1.0", "end-1c")
+            if ipvitima and not ipvitima.isspace():
+                ipMsg.insert("end",f"\n[USUARIO]: {ipvitima}\n")
+                ip = requests.get(f'https://api.incolumitas.com/?q={ipvitima}').text
+                ipMsg.insert("end", ip)
+            else:
+                ipMsg.insert("end","[SISTEMA]: Desculpe, você deve digitar algo no texto!\n")
+                
+        ipWindow = ctk.CTk()
+        ipWindow.title("IP Location")
+        ipWindow.configure(width=740, height=480)
+        ipWindow.resizable(width=False, height=False)
+
+        ipText = ctk.CTkTextbox(ipWindow, height=5, width=500)
+        ipText.place(x=10, y=335)
+
+        ipSend = ctk.CTkButton(ipWindow, text="Enviar", height=30, width=10, command=ipsendfunc)
+        ipSend.place(x=525, y=335)
+
+        ipMsg = ctk.CTkTextbox(ipWindow, height=300, width=565)
+        ipMsg.place(x=10, y=20)
+
+        firstmsg()
+        ipWindow.mainloop()
 
     def SocialFunction(self):
+        result_queue = []
         ctk.set_default_color_theme("green")
+        print_lock = threading.Lock()
+        
+        
         def socialFirstMsg():
-            socialMsg.insert("end", "[SISTEMA]: Bem vindo! Digite o nome de um usuario para procura-lo em nossa lista de redes\nsociais.\n")
+            socialMsg.insert("end", "[SISTEMA]: Bem vindo! Digite o nome de um usuário para procurá-lo em nossa lista de redes sociais.\n")
+
+
+        #def trolling():
+            #source = requests.get(url).text
+            #if vitima in source:
+                #with print_lock:
+                    #url = socialMsg.insert("end", "[SISTEMA]: Rede Social encontrada: https://www.{}.com/{}\n".format(website,vitima))
+            #else:
+                #pass
         def sendfunc():
-            mensagem = socialText.get("1.0", "end-1c") # definitivamente eu que fiz isso kkkk
-            #socialMsg.delete("1.0", "end")
-            if mensagem and not mensagem.isspace():
-                socialMsg.insert("end", "[Usuario]: {} \n".format(mensagem))
+            vitima = socialText.get("1.0", "end-1c")
+            if vitima and not vitima.isspace():
+                socialMsg.insert("end", "[Usuário]: {}\n".format(vitima))
+                WEBSITES = [
+                    f"https://www.instagram.com/{vitima}", f"https://www.facebook.com/{vitima}", f"https://twitter.com/{vitima}", f"https://www.youtube.com/user/{vitima}", f"https://{vitima}.blogspot.com", f"https://www.reddit.com/user/{vitima}",
+                    f"https://{vitima}.wordpress.com", f"https://www.pinterest.com/{vitima}", f"https://www.github.com/{vitima}", f"https://{vitima}.tumblr.com", f"https://www.flickr.com/people/{vitima}", f"https://steamcommunity.com/id/{vitima}", f"https://vimeo.com/{vitima}", f"https://soundcloud.com/{vitima}", f"https://disqus.com/by/{vitima}",
+                    f"https://medium.com/@{vitima}", f"https://{vitima}.deviantart.com", f"https://vk.com/{vitima}", f"https://about.me/{vitima}", f"https://imgur.com/user/{vitima}", f"https://flipboard.com/@{vitima}", f"https://slideshare.net/{vitima}", f"https://fotolog.com/{vitima}", f"https://open.spotify.com/user/{vitima}",
+                    f"https://www.mixcloud.com/{vitima}", f"https://www.scribd.com/{vitima}", f"https://www.badoo.com/en/{vitima}", f"https://www.patreon.com/{vitima}", f"https://bitbucket.org/{vitima}", f"https://www.dailymotion.com/{vitima}", f"https://www.etsy.com/shop/{vitima}", f"https://cash.me/{vitima}", f"https://www.behance.net/{vitima}",
+                    f"https://www.goodreads.com/{vitima}", f"https://www.instructables.com/member/{vitima}", f"https://keybase.io/{vitima}", f"https://kongregate.com/accounts/{vitima}", f"https://{vitima}.livejournal.com", f"https://angel.co/{vitima}", f"https://last.fm/user/{vitima}",
+                    f"https://dribbble.com/{vitima}", f"https://www.codecademy.com/{vitima}", f"https://en.gravatar.com/{vitima}", f"https://pastebin.com/u/{vitima}", f"https://foursquare.com/{vitima}", f"https://www.roblox.com/user.aspx?username={vitima}", f"https://www.gumroad.com/{vitima}", f"https://{vitima}.newgrounds.com"
+                ]
+                # Sim, eu sei que esse codigo ta horrivel mas e o que deu pra fazer em 2 dias.
+
+                with concurrent.futures.ThreadPoolExecutor(max_workers=30) as executor:
+                    for url in WEBSITES:
+                        executor.submit(redes, url, vitima, result_queue)
+
+                socialMsg.after(100, update_messages)
             else:
-                socialMsg.insert("end", "[SISTEMA]: Desculpe, voce deve colocar algo no texto!\n")
+                socialMsg.insert("end", "[SISTEMA]: Desculpe, você deve digitar algo no texto!\n")
+
+        def redes(url, vitima, result_queue):
+            source = requests.get(url).text
+            if vitima in source:
+                with print_lock:
+                    result_queue.append(url)
+
+        def update_messages():
+            if result_queue:
+                with print_lock:
+                    for url in result_queue:
+                        socialMsg.insert("end", "[SISTEMA]: Rede Social encontrada: {}\n".format(url))
+                result_queue.clear()
+            socialMsg.after(100, update_messages)
+    
+           
+
         socialWindow = ctk.CTk()
         socialWindow.title("Social Media Lookup")
-        socialWindow.configure(width=600, height=400)
+        socialWindow.configure(width=740, height=480)
         socialWindow.resizable(width=False, height=False)
 
-        socialText = ctk.CTkTextbox(socialWindow, height=50, width=500)
+        socialText = ctk.CTkTextbox(socialWindow, height=5, width=500)
         socialText.place(x=10, y=335)
 
-        socialSend = ctk.CTkButton(socialWindow, text="Enviar", height=50, width=50, command=sendfunc)
+        socialSend = ctk.CTkButton(socialWindow, text="Enviar", height=30, width=10, command=sendfunc)
         socialSend.place(x=525, y=335)
 
         socialMsg = ctk.CTkTextbox(socialWindow, height=300, width=565)
