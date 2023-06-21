@@ -20,6 +20,6 @@ qualquer coisa e so procurar como baixar as dependencias, o nome delas estao no 
     
 ## Creditos 📖
 
-- [@ThatLukinhasGuy](https://www.github.com/octokatherine) por ter ajudado na parte de queue dos websites
+- [@ThatLukinhasGuy](https://www.github.com/thatlukinhasguy) por ter ajudado na parte de queue dos websites
 - [@Visivel](https://www.github.com/visivel) eu poxa
 
