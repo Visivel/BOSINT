@@ -8,6 +8,7 @@ Abreviação de Basic Open Source Inteligence Search
 - Dark Theme & White theme (with switch button)
 - More searching tools and stuff
 - Optimize it cuz i cant handle that shit anymore :sob:
+- Fix screen size bug
   
 ## Funcionalidades
 
