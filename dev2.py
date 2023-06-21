@@ -108,6 +108,7 @@ class App:
                     f"https://dribbble.com/{vitima}", f"https://www.codecademy.com/{vitima}", f"https://en.gravatar.com/{vitima}", f"https://pastebin.com/u/{vitima}", f"https://foursquare.com/{vitima}", f"https://www.roblox.com/user.aspx?username={vitima}", f"https://www.gumroad.com/{vitima}", f"https://{vitima}.newgrounds.com"
                 ]
                 # Sim, eu sei que esse codigo ta horrivel mas e o que deu pra fazer em 2 dias.
+                # Filtrar alguns webites
 
                 with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
                     for url in WEBSITES:
@@ -130,6 +131,7 @@ class App:
                 socialMsg.insert("end", f"[SISTEMA]: Tempo limite de leitura excedido para o site: {url}")
             except requests.SSLError:
                 socialMsg.insert("end", f"[SISTEMA]: Tempo limite de leitura excedido para o site: {url}")
+                
 
         def update_messages():
             if result_queue:
