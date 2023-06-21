@@ -69,6 +69,9 @@ class App:
 
         ipMsg = ctk.CTkTextbox(ipWindow, height=300, width=565)
         ipMsg.place(x=10, y=20)
+        ipMsg.bind("<KeyPress>", lambda e: "break")
+        ipMsg.bind("<KeyRelease>", lambda e: "break")
+        # ipMsg.bind("<Button-1>", lambda e: "break") caso queira pra nao poder copiar
 
         firstmsg()
         ipWindow.mainloop()
@@ -141,6 +144,9 @@ class App:
 
         socialMsg = ctk.CTkTextbox(socialWindow, height=300, width=565)
         socialMsg.place(x=10, y=20)
+        socialMsg.bind("<KeyPress>", lambda e: "break")
+        socialMsg.bind("<KeyRelease>", lambda e: "break")
+        # socialMsg.bind("<Button-1>", lambda e: "break") caso queira para nao poder copiar
 
         socialFirstMsg()
         socialWindow.mainloop()
