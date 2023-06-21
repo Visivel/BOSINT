@@ -1,5 +1,5 @@
 # BOZOINTS KKKKKKKK 🤡
-WELCOME FOR ALL DEVS ON THE TROLLING ZONE (me having schizo grr)
+WELCOME FOR ALL DEVS ON THE TROLLING ZONE (me having schizo grr)\
 Um programa basico de OSINT (Open Source Inteligence) para procurar cyber criminais\
 Abreviação de Basic Open Source Inteligence Search
 
