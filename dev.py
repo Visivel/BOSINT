@@ -1,4 +1,6 @@
 import customtkinter as ctk
+import asyncio
+import aiohttp
 import threading
 import concurrent.futures
 import requests
@@ -12,7 +14,8 @@ class App:
         height = 432
         screenwidth = root.winfo_screenwidth()
         screenheight = root.winfo_screenheight()
-        alignstr = '%dx%d+%d+%d' % (width, height, (screenwidth - width) / 2, (screenheight - height) / 2)
+        alignstr = '%dx%d+%d+%d' % (width, height,
+                                    (screenwidth - width) / 2, (screenheight - height) / 2)
         root.geometry(alignstr)
         root.resizable(width=False, height=False)
 
@@ -21,82 +24,126 @@ class App:
         mainFrame.configure(width=600, height=250)
 
         buttonIPLocation = ctk.CTkButton(root)
-        buttonIPLocation.configure(font=("Algma coisa", 25), text="IP Location", command=self.IPFunction)
+        buttonIPLocation.configure(
+            font=("Algma coisa", 25), text="IP Location", command=self.IPFunction)
         buttonIPLocation.place(x=80, y=150)
         buttonIPLocation.configure(width=244, height=88)
 
         labelTitle = ctk.CTkLabel(mainFrame)
-        labelTitle.configure(font=("Times", 50, "bold"), text="BOSINTS", justify="center")
+        labelTitle.configure(font=("Times", 50, "bold"),
+                             text="BOSINTS", justify="center")
         labelTitle.place(x=140, y=40)
         labelTitle.configure(width=328, height=30)
 
         labelDescription = ctk.CTkLabel(root)
-        labelDescription.configure(font=("Times", 30), text="Basic OSINT Search")
+        labelDescription.configure(
+            font=("Times", 30), text="Basic OSINT Search")
         labelDescription.place(x=230, y=320)
 
         labelCredits = ctk.CTkLabel(root)
-        labelCredits.configure(font=("Times", 15), text="Made by Mikael", text_color="green")
+        labelCredits.configure(
+            font=("Times", 15), text="Made by Mikael", text_color="green")
         labelCredits.place(x=300, y=350)
 
         buttonSocial = ctk.CTkButton(root)
-        buttonSocial.configure(font=("Alguma outra coisa", 25), text="Social Media Lookup", command=self.SocialFunction)
+        buttonSocial.configure(
+            font=("roboto", 25), text="Social Media Lookup", command=self.SocialFunction)
         buttonSocial.place(x=390, y=150)
         buttonSocial.configure(width=237, height=89)
 
     def IPFunction(self):
-        print("test")
+        ctk.set_default_color_theme("green")
+
+        def firstmsg():
+            ipMsg.insert(
+                "end", "[SISTEMA]: Bem vindo! Digite um IP para localiza-lo.\n")
+
+        def ipsendfunc():
+            ipvitima = ipText.get("1.0", "end-1c")
+            if ipvitima and not ipvitima.isspace():
+                ipMsg.insert("end", f"\n[USUARIO]: {ipvitima}\n")
+                ip = requests.get(
+                    f'https://api.incolumitas.com/?q={ipvitima}').text
+                ipMsg.insert("end", ip)
+            else:
+                ipMsg.insert(
+                    "end", "[SISTEMA]: Desculpe, você deve digitar algo no texto!\n")
+
+        ipWindow = ctk.CTk()
+        ipWindow.title("IP Location")
+        ipWindow.configure(width=740, height=480)
+        ipWindow.resizable(width=False, height=False)
+
+        ipText = ctk.CTkTextbox(ipWindow, height=5, width=500)
+        ipText.place(x=10, y=335)
+
+        ipSend = ctk.CTkButton(ipWindow, text="Enviar",
+                               height=30, width=10, command=ipsendfunc)
+        ipSend.place(x=525, y=335)
+
+        ipMsg = ctk.CTkTextbox(ipWindow, height=300, width=565)
+        ipMsg.place(x=10, y=20)
+        ipMsg.bind("<KeyPress>", lambda e: "break")
+        ipMsg.bind("<KeyRelease>", lambda e: "break")
+        # ipMsg.bind("<Button-1>", lambda e: "break") caso queira pra nao poder copiar
+
+        firstmsg()
+        ipWindow.mainloop()
+
+    async def some_other_async_function(self):
+        social_function = App.SocialFunction()
+        await social_function.sendfunc()
 
     def SocialFunction(self):
+        result_queue = []
         ctk.set_default_color_theme("green")
         print_lock = threading.Lock()
 
-        WEBSITES = [
-            "instagram", "facebook", "twitter", "youtube", "blogger", "google_plus", "reddit",
-            "wordpress", "pinterest", "github", "tumblr", "flickr", "steam", "vimeo", "soundcloud", "disqus",
-            "medium", "deviantart", "vk", "aboutme", "imgur", "flipboard", "slideshare", "fotolog", "spotify",
-            "mixcloud", "scribd", "badoo", "patreon", "bitbucket", "dailymotion", "etsy", "cashme", "behance",
-            "goodreads", "instructables", "keybase", "kongregate", "livejournal", "angellist", "last_fm",
-            "dribbble", "codecademy", "gravatar", "pastebin", "foursquare", "roblox", "gumroad", "newsground",
-            "wattpad", "canva", "creative_market", "trakt", "five_hundred_px", "buzzfeed", "tripadvisor", "hubpages",
-            "contently", "houzz", "blipfm", "wikipedia", "hackernews", "reverb_nation", "designspiration",
-            "bandcamp", "colourlovers", "ifttt", "ebay", "slack", "okcupid", "trip", "ello", "tracky", "basecamp"
-        ]
-        
         def socialFirstMsg():
-            socialMsg.insert("end", "[SISTEMA]: Bem vindo! Digite o nome de um usuário para procurá-lo em nossa lista de redes sociais.\n")
+            socialMsg.insert(
+                "end", "[SISTEMA]: Bem vindo! Digite o nome de um usuário para procurá-lo em nossa lista de redes sociais.\n")
 
+        # def trolling():
+            #source = requests.get(url).text
+            # if vitima in source:
+            # with print_lock:
+            #url = socialMsg.insert("end", "[SISTEMA]: Rede Social encontrada: https://www.{}.com/{}\n".format(website,vitima))
+            # else:
+            # pass
 
-        def trolling():
-            source = requests.get(url).text
-            if vitima in source:
-                with print_lock:
-                    url = socialMsg.insert("end", "[SISTEMA]: Rede Social encontrada: https://www.{}.com/{}\n".format(website,vitima))
-            else:
-                pass
-        def sendfunc():
+        async def sendfunc():
             vitima = socialText.get("1.0", "end-1c")
-            
-            
-            
             if vitima and not vitima.isspace():
                 socialMsg.insert("end", "[Usuário]: {}\n".format(vitima))
-                
-                with concurrent.futures.ThreadPoolExecutor(max_workers=30) as executor:
+                WEBSITES = [
+                    f"https://www.instagram.com/{vitima}", f"https://www.facebook.com/{vitima}", f"https://twitter.com/{vitima}", f"https://www.youtube.com/user/{vitima}", f"https://{vitima}.blogspot.com", f"https://www.reddit.com/user/{vitima}",
+                    f"https://{vitima}.wordpress.com", f"https://www.pinterest.com/{vitima}", f"https://www.github.com/{vitima}", f"https://{vitima}.tumblr.com", f"https://www.flickr.com/people/{vitima}", f"https://steamcommunity.com/id/{vitima}", f"https://vimeo.com/{vitima}", f"https://soundcloud.com/{vitima}", f"https://disqus.com/by/{vitima}",
+                    f"https://medium.com/@{vitima}", f"https://{vitima}.deviantart.com", f"https://vk.com/{vitima}", f"https://about.me/{vitima}", f"https://imgur.com/user/{vitima}", f"https://flipboard.com/@{vitima}", f"https://slideshare.net/{vitima}", f"https://fotolog.com/{vitima}", f"https://open.spotify.com/user/{vitima}",
+                    f"https://www.mixcloud.com/{vitima}", f"https://www.scribd.com/{vitima}", f"https://www.badoo.com/en/{vitima}", f"https://www.patreon.com/{vitima}", f"https://bitbucket.org/{vitima}", f"https://www.dailymotion.com/{vitima}", f"https://www.etsy.com/shop/{vitima}", f"https://cash.me/{vitima}", f"https://www.behance.net/{vitima}",
+                    f"https://www.goodreads.com/{vitima}", f"https://www.instructables.com/member/{vitima}", f"https://keybase.io/{vitima}", f"https://kongregate.com/accounts/{vitima}", f"https://{vitima}.livejournal.com", f"https://angel.co/{vitima}", f"https://last.fm/user/{vitima}",
+                    f"https://dribbble.com/{vitima}", f"https://www.codecademy.com/{vitima}", f"https://en.gravatar.com/{vitima}", f"https://pastebin.com/u/{vitima}", f"https://foursquare.com/{vitima}", f"https://www.roblox.com/user.aspx?username={vitima}", f"https://www.gumroad.com/{vitima}", f"https://{vitima}.newgrounds.com"
+                ]
+                # Sim, eu sei que esse código tá horrível, mas é o que deu pra fazer em 2 dias.
+
+                async with aiohttp.ClientSession() as session:
+                    tasks = []
                     for url in WEBSITES:
-                        executor.submit(sendfunc, url)
-                
-                source = requests.get(url).text
-                if vitima in source:
-                    with print_lock:
-                        socialMsg.insert("end", "[SISTEMA]: Rede Social encontrada: {}\n".format(url))
-                else:
-                    pass
-                
-            else:
-                socialMsg.insert("end", "[SISTEMA]: Desculpe, você deve digitar algo no texto!\n")
+                        task = asyncio.create_task(
+                            self.check_website(session, url, vitima))
+                        tasks.append(task)
 
-           
+                    for task in asyncio.as_completed(tasks):
+                        result = await task
+                        if result:
+                            url, vitima = result
+                            self.socialMsg.insert(
+                                "end", "[SISTEMA]: Rede Social encontrada: {}\n".format(url))
 
+                            self.socialMsg.insert(
+                                "end", "[SISTEMA]: Busca concluída!\n")
+                        else:
+                            self.socialMsg.insert(
+                                "end", "[SISTEMA]: Desculpe, você deve digitar algo no texto!\n")
         socialWindow = ctk.CTk()
         socialWindow.title("Social Media Lookup")
         socialWindow.configure(width=740, height=480)
@@ -105,14 +152,20 @@ class App:
         socialText = ctk.CTkTextbox(socialWindow, height=5, width=500)
         socialText.place(x=10, y=335)
 
-        socialSend = ctk.CTkButton(socialWindow, text="Enviar", height=30, width=10, command=sendfunc)
+        socialSend = ctk.CTkButton(
+            socialWindow, text="Enviar", height=30, width=10, command=sendfunc)
         socialSend.place(x=525, y=335)
 
         socialMsg = ctk.CTkTextbox(socialWindow, height=300, width=565)
         socialMsg.place(x=10, y=20)
+        socialMsg.bind("<KeyPress>", lambda e: "break")
+        socialMsg.bind("<KeyRelease>", lambda e: "break")
+        # socialMsg.bind("<Button-1>", lambda e: "break") caso queira para nao poder copiar
 
         socialFirstMsg()
         socialWindow.mainloop()
+
+
 if __name__ == "__main__":
     root = ctk.CTk()
     app = App(root)
