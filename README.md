@@ -7,7 +7,6 @@ Abreviação de Basic Open Source Inteligence Search
 
 - Localizacao de IP
 - Busca de nomes de usuarios em sites
-Eu tambem mais tarde vou colocar outras funcoes como puxar dados e Temas escuro ou claro.
 ## Instalação
 
 Antes de tudo baixe o main.py e requirements.txt em alguma pasta e va no CMD\
