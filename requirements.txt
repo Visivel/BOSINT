@@ -1,0 +1,4 @@
+customtkinter
+threading
+futures
+requests
