@@ -2,6 +2,8 @@ import customtkinter as ctk
 import threading
 import concurrent.futures
 import requests
+import  requests.exceptions
+import time
 
 
 class App:
@@ -39,28 +41,48 @@ class App:
         labelCredits.place(x=300, y=350)
 
         buttonSocial = ctk.CTkButton(root)
-        buttonSocial.configure(font=("Alguma outra coisa", 25), text="Social Media Lookup", command=self.SocialFunction)
+        buttonSocial.configure(font=("roboto", 25), text="Social Media Lookup", command=self.SocialFunction)
         buttonSocial.place(x=390, y=150)
         buttonSocial.configure(width=237, height=89)
 
     def IPFunction(self):
-        print("test")
+        ctk.set_default_color_theme("green")
+        def firstmsg():
+            ipMsg.insert("end","[SISTEMA]: Bem vindo! Digite um IP para localiza-lo.\n")
+        def ipsendfunc():
+            ipvitima = ipText.get("1.0", "end-1c")
+            if ipvitima and not ipvitima.isspace():
+                ipMsg.insert("end",f"\n[USUARIO]: {ipvitima}\n")
+                ip = requests.get(f'https://api.incolumitas.com/?q={ipvitima}').text
+                ipMsg.insert("end", ip)
+            else:
+                ipMsg.insert("end","[SISTEMA]: Desculpe, você deve digitar algo no texto!\n")
+                
+        ipWindow = ctk.CTk()
+        ipWindow.title("IP Location")
+        ipWindow.configure(width=740, height=480)
+        ipWindow.resizable(width=False, height=False)
+
+        ipText = ctk.CTkTextbox(ipWindow, height=5, width=500)
+        ipText.place(x=10, y=335)
+
+        ipSend = ctk.CTkButton(ipWindow, text="Enviar", height=30, width=10, command=ipsendfunc)
+        ipSend.place(x=525, y=335)
+
+        ipMsg = ctk.CTkTextbox(ipWindow, height=300, width=565)
+        ipMsg.place(x=10, y=20)
+        ipMsg.bind("<KeyPress>", lambda e: "break")
+        ipMsg.bind("<KeyRelease>", lambda e: "break")
+        # ipMsg.bind("<Button-1>", lambda e: "break") caso queira pra nao poder copiar
+
+        firstmsg()
+        ipWindow.mainloop()
 
     def SocialFunction(self):
+        result_queue = []
         ctk.set_default_color_theme("green")
         print_lock = threading.Lock()
-
-        WEBSITES = [
-            "https://www.instagram.com/{vitima}", "https://www.facebook.com/{vitima}", "https://twitter.com/{vitima}", "https://www.youtube.com/user/{vitima}", "https://{vitima}.blogspot.com", "https://www.reddit.com/user/{vitima}",
-            "https://{vitima}.wordpress.com", "https://www.pinterest.com/{vitima}", "https://www.github.com/{vitima}", "https://{vitima}.tumblr.com", "https://www.flickr.com/people/{vitima}", "https://steamcommunity.com/id/{vitima}", "https://vimeo.com/{vitima}", "https://soundcloud.com/{vitima}", "https://disqus.com/by/{vitima}",
-            "https://medium.com/@{vitima}", "https://{vitima}.deviantart.com", "https://vk.com/{vitima}", "https://about.me/{vitima}", "https://imgur.com/user/{vitima}", "https://flipboard.com/@{vitima}", "https://slideshare.net/{vitima}", "https://fotolog.com/{vitima}", "https://open.spotify.com/user/{vitima}",
-            "https://www.mixcloud.com/{vitima}", "https://www.scribd.com/{vitima}", "https://www.badoo.com/en/{vitima}", "https://www.patreon.com/{vitima}", "https://bitbucket.org/{vitima}", "https://www.dailymotion.com/{vitima}", "https://www.etsy.com/shop/{vitima}", "https://cash.me/{vitima}", "https://www.behance.net/{vitima}",
-            "https://www.goodreads.com/{vitima}", "https://www.instructables.com/member/{vitima}", "https://keybase.io/{vitima}", "https://kongregate.com/accounts/{vitima}", "https://{vitima}.livejournal.com", "https://angel.co/{vitima}", "https://last.fm/user/{vitima}",
-            "https://dribbble.com/{vitima}", "https://www.codecademy.com/{vitima}", "https://en.gravatar.com/{vitima}", "https://pastebin.com/u/{vitima}", "https://foursquare.com/{vitima}", "https://www.roblox.com/user.aspx?username={vitima}", "https://www.gumroad.com/{vitima}", "https://{vitima}.newgrounds.com",
-            "https://www.wattpad.com/user/{vitima}", "https://www.canva.com/{vitima}", "https://creativemarket.com/{vitima}", "https://www.trakt.tv/users/{vitima}", "https://500px.com/{vitima}", "https://buzzfeed.com/{vitima}", "https://tripadvisor.com/members/{vitima}", "https://{vitima}.hubpages.com",
-            "https://{vitima}.contently.com", "https://houzz.com/user/{vitima}", "https://blip.fm/{vitima}", "https://www.wikipedia.org/wiki/User:{vitima}", "https://news.ycombinator.com/user?id={vitima}", "https://www.reverbnation.com/{vitima}", "https://www.designspiration.net/{vitima}",
-            "https://www.bandcamp.com/{vitima}", "https://www.colourlovers.com/love/{vitima}", "https://www.ifttt.com/p/{vitima}", "https://www.ebay.com/usr/{vitima}", "https://{vitima}.slack.com", "https://www.okcupid.com/profile/{vitima}", "https://www.trip.skyscanner.com/user/{vitima}", "https://ello.co/{vitima}", "https://tracky.com/user/~{vitima}", "https://{vitima}.basecamphq.com/login"
-        ]
+        
         
         def socialFirstMsg():
             socialMsg.insert("end", "[SISTEMA]: Bem vindo! Digite o nome de um usuário para procurá-lo em nossa lista de redes sociais.\n")
@@ -75,25 +97,47 @@ class App:
                 #pass
         def sendfunc():
             vitima = socialText.get("1.0", "end-1c")
-            
-            
-            
             if vitima and not vitima.isspace():
                 socialMsg.insert("end", "[Usuário]: {}\n".format(vitima))
-                
-                with concurrent.futures.ThreadPoolExecutor(max_workers=30) as executor:
+                WEBSITES = [
+                    f"https://www.instagram.com/{vitima}", f"https://www.facebook.com/{vitima}", f"https://twitter.com/{vitima}", f"https://www.youtube.com/user/{vitima}", f"https://{vitima}.blogspot.com", f"https://www.reddit.com/user/{vitima}",
+                    f"https://{vitima}.wordpress.com", f"https://www.pinterest.com/{vitima}", f"https://www.github.com/{vitima}", f"https://{vitima}.tumblr.com", f"https://www.flickr.com/people/{vitima}", f"https://steamcommunity.com/id/{vitima}", f"https://vimeo.com/{vitima}", f"https://soundcloud.com/{vitima}", f"https://disqus.com/by/{vitima}",
+                    f"https://medium.com/@{vitima}", f"https://{vitima}.deviantart.com", f"https://vk.com/{vitima}", f"https://about.me/{vitima}", f"https://imgur.com/user/{vitima}", f"https://flipboard.com/@{vitima}", f"https://slideshare.net/{vitima}", f"https://fotolog.com/{vitima}", f"https://open.spotify.com/user/{vitima}",
+                    f"https://www.mixcloud.com/{vitima}", f"https://www.scribd.com/{vitima}", f"https://www.badoo.com/en/{vitima}", f"https://www.patreon.com/{vitima}", f"https://bitbucket.org/{vitima}", f"https://www.dailymotion.com/{vitima}", f"https://www.etsy.com/shop/{vitima}", f"https://cash.me/{vitima}", f"https://www.behance.net/{vitima}",
+                    f"https://www.goodreads.com/{vitima}", f"https://www.instructables.com/member/{vitima}", f"https://keybase.io/{vitima}", f"https://kongregate.com/accounts/{vitima}", f"https://{vitima}.livejournal.com", f"https://angel.co/{vitima}", f"https://last.fm/user/{vitima}",
+                    f"https://dribbble.com/{vitima}", f"https://www.codecademy.com/{vitima}", f"https://en.gravatar.com/{vitima}", f"https://pastebin.com/u/{vitima}", f"https://foursquare.com/{vitima}", f"https://www.roblox.com/user.aspx?username={vitima}", f"https://www.gumroad.com/{vitima}", f"https://{vitima}.newgrounds.com"
+                ]
+                # Sim, eu sei que esse codigo ta horrivel mas e o que deu pra fazer em 2 dias.
+
+                with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
                     for url in WEBSITES:
-                        executor.submit(sendfunc, url)
-                
-                source = requests.get(f'https://{url}.com/{vitima}').text
-                if vitima in source:
-                    with print_lock:
-                        socialMsg.insert("end", "[SISTEMA]: Rede Social encontrada: {}\n".format(source))
-                else:
-                    pass
-                
+                        executor.submit(redes, url, vitima, result_queue)
+
+                socialMsg.after(10, update_messages)
             else:
                 socialMsg.insert("end", "[SISTEMA]: Desculpe, você deve digitar algo no texto!\n")
+
+        def redes(url, vitima, result_queue):
+            try:
+                source = requests.get(url, timeout=15, verify=False).text
+                if vitima in source:
+                    with print_lock:
+                        result_queue.append(url)
+                time.sleep(1)
+            except requests.ReadTimeout:
+                socialMsg.insert("end", f"[SISTEMA]: Tempo limite de leitura excedido para o site: {url}")
+            except requests.ConnectTimeout:
+                socialMsg.insert("end", f"[SISTEMA]: Tempo limite de leitura excedido para o site: {url}")
+            except requests.SSLError:
+                socialMsg.insert("end", f"[SISTEMA]: Tempo limite de leitura excedido para o site: {url}")
+
+        def update_messages():
+            if result_queue:
+                with print_lock:
+                    for url in result_queue:
+                        socialMsg.insert("end", "[SISTEMA]: Rede Social encontrada: {}\n".format(url))
+                result_queue.clear()
+            socialMsg.after(100, update_messages)
     
            
 
@@ -110,6 +154,9 @@ class App:
 
         socialMsg = ctk.CTkTextbox(socialWindow, height=300, width=565)
         socialMsg.place(x=10, y=20)
+        socialMsg.bind("<KeyPress>", lambda e: "break")
+        socialMsg.bind("<KeyRelease>", lambda e: "break")
+        # socialMsg.bind("<Button-1>", lambda e: "break") caso queira para nao poder copiar
 
         socialFirstMsg()
         socialWindow.mainloop()
