@@ -2,8 +2,8 @@ import customtkinter as ctk
 import threading
 import concurrent.futures
 import requests
-import  requests.exceptions
-import time
+import requests.exceptions
+from time import sleep
 
 
 class App:
@@ -85,7 +85,7 @@ class App:
         
         
         def socialFirstMsg():
-            socialMsg.insert("end", "[SISTEMA]: Bem vindo! Digite o nome de um usuário para procurá-lo em nossa lista de redes sociais.\n")
+            socialMsg.insert("end", "[SISTEMA]: Bem vindo! Digite o nome de um usuário para procurá-lo em nossa lista de redes sociais.\n(Detalhe: O programa pode demorar ate 10 segundos para dar sua resposta)\n")
 
 
         #def trolling():
@@ -101,13 +101,13 @@ class App:
                 socialMsg.insert("end", "[Usuário]: {}\n".format(vitima))
                 WEBSITES = [
                     f"https://www.instagram.com/{vitima}", f"https://www.facebook.com/{vitima}", f"https://twitter.com/{vitima}", f"https://www.youtube.com/user/{vitima}", f"https://{vitima}.blogspot.com", f"https://www.reddit.com/user/{vitima}",
-                    f"https://{vitima}.wordpress.com", f"https://www.pinterest.com/{vitima}", f"https://www.github.com/{vitima}", f"https://{vitima}.tumblr.com", f"https://www.flickr.com/people/{vitima}", f"https://steamcommunity.com/id/{vitima}", f"https://vimeo.com/{vitima}", f"https://soundcloud.com/{vitima}", f"https://disqus.com/by/{vitima}",
-                    f"https://medium.com/@{vitima}", f"https://{vitima}.deviantart.com", f"https://vk.com/{vitima}", f"https://about.me/{vitima}", f"https://imgur.com/user/{vitima}", f"https://flipboard.com/@{vitima}", f"https://slideshare.net/{vitima}", f"https://fotolog.com/{vitima}", f"https://open.spotify.com/user/{vitima}",
-                    f"https://www.mixcloud.com/{vitima}", f"https://www.scribd.com/{vitima}", f"https://www.badoo.com/en/{vitima}", f"https://www.patreon.com/{vitima}", f"https://bitbucket.org/{vitima}", f"https://www.dailymotion.com/{vitima}", f"https://www.etsy.com/shop/{vitima}", f"https://cash.me/{vitima}", f"https://www.behance.net/{vitima}",
-                    f"https://www.goodreads.com/{vitima}", f"https://www.instructables.com/member/{vitima}", f"https://keybase.io/{vitima}", f"https://kongregate.com/accounts/{vitima}", f"https://{vitima}.livejournal.com", f"https://angel.co/{vitima}", f"https://last.fm/user/{vitima}",
-                    f"https://dribbble.com/{vitima}", f"https://www.codecademy.com/{vitima}", f"https://en.gravatar.com/{vitima}", f"https://pastebin.com/u/{vitima}", f"https://foursquare.com/{vitima}", f"https://www.roblox.com/user.aspx?username={vitima}", f"https://www.gumroad.com/{vitima}", f"https://{vitima}.newgrounds.com"
+                    f"https://{vitima}.wordpress.com", f"https://www.pinterest.com/{vitima}", f"https://www.github.com/{vitima}", f"https://{vitima}.tumblr.com", f"https://www.flickr.com/people/{vitima}", f"https://steamcommunity.com/id/{vitima}", f"https://vimeo.com/{vitima}", f"https://soundcloud.com/{vitima}",
+                    f"https://medium.com/@{vitima}", f"https://{vitima}.deviantart.com", f"https://vk.com/{vitima}", f"https://about.me/{vitima}", f"https://imgur.com/user/{vitima}", f"https://slideshare.net/{vitima}", f"https://fotolog.com/{vitima}", f"https://open.spotify.com/user/{vitima}",
+                    f"https://www.scribd.com/{vitima}", f"https://www.patreon.com/{vitima}", f"https://bitbucket.org/{vitima}", f"https://www.dailymotion.com/{vitima}", f"https://www.etsy.com/shop/{vitima}", f"https://cash.me/{vitima}", f"https://www.behance.net/{vitima}",
+                    f"https://keybase.io/{vitima}", f"https://kongregate.com/accounts/{vitima}", f"https://angel.co/{vitima}", f"https://last.fm/user/{vitima}",
+                    f"https://www.codecademy.com/{vitima}", f"https://en.gravatar.com/{vitima}", f"https://pastebin.com/u/{vitima}", f"https://foursquare.com/{vitima}", f"https://www.roblox.com/user.aspx?username={vitima}", f"https://{vitima}.newgrounds.com"
                 ]
-                # Sim, eu sei que esse codigo ta horrivel mas e o que deu pra fazer em 2 dias.
+                # Sim, eu sei que esse codigo ta horrivel mas e o que deu pra fazer em 4 dias.
                 # Filtrar alguns webites
 
                 with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
@@ -120,17 +120,17 @@ class App:
 
         def redes(url, vitima, result_queue):
             try:
-                source = requests.get(url, timeout=15, verify=False).text
+                source = requests.get(url, timeout=5, verify=False).text
                 if vitima in source:
                     with print_lock:
                         result_queue.append(url)
-                time.sleep(1)
+                sleep(1)
             except requests.ReadTimeout:
-                socialMsg.insert("end", f"[SISTEMA]: Tempo limite de leitura excedido para o site: {url}")
+                socialMsg.insert("end", f"[DEBUG]: Tempo limite de leitura excedido para o site: {url}")
             except requests.ConnectTimeout:
-                socialMsg.insert("end", f"[SISTEMA]: Tempo limite de leitura excedido para o site: {url}")
+                socialMsg.insert("end", f"[DEBUG]: Tempo limite para conectar foi excedido no website: {url}")
             except requests.SSLError:
-                socialMsg.insert("end", f"[SISTEMA]: Tempo limite de leitura excedido para o site: {url}")
+                socialMsg.insert("end", f"[DEBUG]: Tempo limite de SSH excedido no website: {url}")
                 
 
         def update_messages():
